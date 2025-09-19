@@ -10,6 +10,8 @@ We utilize 8 RTX2080Ti GPUs to train our model.
 | r50_256x704_8f_openocc |  24   |  7.5GB   |  40.8  | 0.41 | [Google-drive](https://drive.google.com/drive/folders/1_RDLHJUcJ9vQMO9nNOBrShGdb5lgBMwR?usp=drive_link) |
 | r50_256x704_8f_openocc |  48   |  7.5GB   |  41.4  | 0.39 | [Google-drive](https://drive.google.com/drive/folders/1_RDLHJUcJ9vQMO9nNOBrShGdb5lgBMwR?usp=drive_link) |
 
+The code for the Occ3D dataset is coming soon..
+
 ## 🛠️Environment
 
 Install Pytorch 1.13 + CUDA 11.6
