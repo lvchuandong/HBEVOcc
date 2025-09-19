@@ -1,0 +1,276 @@
+Metadata-Version: 2.1
+Name: mmdet3d
+Version: 1.0.0rc4
+Summary: OpenMMLab's next-generation platformfor general 3D object detection.
+Home-page: https://github.com/open-mmlab/mmdetection3d
+Author: MMDetection3D Contributors
+Author-email: zwwdev@gmail.com
+License: Apache License 2.0
+Keywords: computer vision,3D object detection
+Classifier: Development Status :: 4 - Beta
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Description-Content-Type: text/markdown
+Requires-Dist: lyft_dataset_sdk
+Requires-Dist: networkx<2.3,>=2.2
+Requires-Dist: numba==0.53.0
+Requires-Dist: numpy
+Requires-Dist: nuscenes-devkit
+Requires-Dist: plyfile
+Requires-Dist: scikit-image
+Requires-Dist: tensorboard
+Requires-Dist: trimesh<2.35.40,>=2.35.39
+Provides-Extra: all
+Requires-Dist: open3d; extra == "all"
+Requires-Dist: spconv; extra == "all"
+Requires-Dist: waymo-open-dataset-tf-2-1-0==1.2.0; extra == "all"
+Requires-Dist: lyft_dataset_sdk; extra == "all"
+Requires-Dist: networkx<2.3,>=2.2; extra == "all"
+Requires-Dist: numba==0.53.0; extra == "all"
+Requires-Dist: numpy; extra == "all"
+Requires-Dist: nuscenes-devkit; extra == "all"
+Requires-Dist: plyfile; extra == "all"
+Requires-Dist: scikit-image; extra == "all"
+Requires-Dist: tensorboard; extra == "all"
+Requires-Dist: trimesh<2.35.40,>=2.35.39; extra == "all"
+Requires-Dist: asynctest; extra == "all"
+Requires-Dist: codecov; extra == "all"
+Requires-Dist: flake8; extra == "all"
+Requires-Dist: interrogate; extra == "all"
+Requires-Dist: isort; extra == "all"
+Requires-Dist: kwarray; extra == "all"
+Requires-Dist: pytest; extra == "all"
+Requires-Dist: pytest-cov; extra == "all"
+Requires-Dist: pytest-runner; extra == "all"
+Requires-Dist: ubelt; extra == "all"
+Requires-Dist: xdoctest>=0.10.0; extra == "all"
+Requires-Dist: yapf; extra == "all"
+Provides-Extra: tests
+Requires-Dist: asynctest; extra == "tests"
+Requires-Dist: codecov; extra == "tests"
+Requires-Dist: flake8; extra == "tests"
+Requires-Dist: interrogate; extra == "tests"
+Requires-Dist: isort; extra == "tests"
+Requires-Dist: kwarray; extra == "tests"
+Requires-Dist: pytest; extra == "tests"
+Requires-Dist: pytest-cov; extra == "tests"
+Requires-Dist: pytest-runner; extra == "tests"
+Requires-Dist: ubelt; extra == "tests"
+Requires-Dist: xdoctest>=0.10.0; extra == "tests"
+Requires-Dist: yapf; extra == "tests"
+Provides-Extra: build
+Provides-Extra: optional
+Requires-Dist: open3d; extra == "optional"
+Requires-Dist: spconv; extra == "optional"
+Requires-Dist: waymo-open-dataset-tf-2-1-0==1.2.0; extra == "optional"
+Provides-Extra: mim
+Requires-Dist: mmcv-full<=1.6.0,>=1.4.8; extra == "mim"
+Requires-Dist: mmdet<=3.0.0,>=2.24.0; extra == "mim"
+Requires-Dist: mmsegmentation<=1.0.0,>=0.20.0; extra == "mim"
+
+# STCOcc
+
+## 版本
+- 0.0 初始运行 要生成多尺度的label
+- 0.0t from0.0进行调试 bs=2 17.1G 重新resume失败 实现了可视化
+- 0.1 from0.0t num_stage为1 改成功 bs=2 15.78G
+- 0.2 from0.1 改成bev的形式 中间还是bev_2_voxel history_frame=2 13.5G
+- 0.3 from0.2 改成全部bev的形式看看
+- 0.3-65-0 from0.3 65服务器训练看看 7.8G 2345M MAVE: 0.70 MIOU: 0.293
+- 0.3-65-1 from0.3-65-0 将时序融合使用concat看看效果，已经可以concat，同时不使用时序注意力 不使用OA_SpatialCrossAttention 看到loss_flow会比之前大很多 7.1G
+- 0.3-65-10 from0.3-65-1 加入evt和ivt
+- 0.3-65-11 from0.3-65-10 把损失函数也改成原来的 8.8G 需要改一下bev_query忘改了 最后那个spatial attention部分还需要改不 2581M
+- 0.4-192-0 from0.3-65-11 spatial attention 修改为原来的不使用depth 未修改完
+- 0.4-192-00 from0.4-192-0 继续修改 已修改成不使用depth
+- 0.4-192-01 from0.4-192-00 load_from加入revise_keys 3046M evt也使用temporal_fusion 删除冗余部分
+- 0.4-192-10 from0.4-192-01 调试occ3d数据集训练
+- 0.4-192-11 from0.4-192-10 解决之前resume报错的问题 解决了，不能用ema.pth要iter_42195.pth，不然pth里面没有'meta' 增加测速fps看看
+- 1.00-65-00-1f-openocc from0.4-192-11 w_hada_h8p4h2 加入1帧时序
+
+## 训练
+```bash
+python tools/generate_ms_occ.py --dataset openocc --pkl_path data/nuscenes/hbevocc-nuscenes_infos_train.pkl
+python tools/generate_ms_occ.py --dataset occ3d --pkl_path data/nuscenes/hbevocc-nuscenes_infos_train.pkl
+bash tools/dist_train.sh config/hbevocc/hbevocc-r50-256x704-1f-openocc.py 1
+bash tools/dist_train.sh config/hbevocc/hbevocc-r50-256x704-1f-occ3d.py 1
+```
+### 环境
+```bash
+ln -s /mnt/HDD/lcd/2D_3D/data/TPVFormer data
+conda create --name stcocc python=3.8
+conda activate stcocc
+pip install torch==1.13.0+cu116 torchvision==0.14.0+cu116 torchaudio==0.13.0 --extra-index-url https://download.pytorch.org/whl/cu116
+pip install mmcv-full==1.7.0 -f https://download.openmmlab.com/mmcv/dist/cu117/torch1.13/index.html
+pip install mmdet==2.28.2
+pip install mmsegmentation==0.30.0
+pip install mmengine
+pip install -v -e .
+pip install numpy==1.23.4
+pip install yapf==0.40.1
+pip install setuptools==59.5.0
+pip install ninja
+pip install einops
+pip install open3d==0.16.0 -i https://pypi.tuna.tsinghua.edu.cn/simple
+如果遇到一直卡在Using /home/lcd/.cache/torch_extensions/py38_cu116 as PyTorch extensions root...
+rm -rf ~/.cache/torch_extensions/py38_cu116
+```
+## 可视化
+```bash
+bash tools/dist_test.sh config/stcocc/stcocc_r50_704x256_16f_openocc_12e.py ckpts/stcocc_r50_704x256_16f_openocc.pth 4
+上面会在results里面生成相应的npz文件
+python tools/vis_results.py --vis-single-data results/scene-0107/84c24cd1d7914f72bb2fa17a6c5c41e5.npz --dataset-type openocc
+```
+## 速度
+```bash
+CUDA_VISIBLE_DEVICES=3 python tools/analysis_tools/benchmark_sequential.py config/hbevocc/hbevocc-r50-256x704-1f-openocc.py work_dirs/hbevocc0.4-00-r50-256x704-1f-openocc/iter_42195_ema.pth
+```
+## 推理
+```bash
+bash tools/dist_test.sh config/stcocc/stcocc_r50_704x256_16f_openocc_12e.py work_dirs/test-stcocc_r50_704x256_16f_openocc_12e/iter_96060_ema.pth 8
+bash tools/dist_test.sh config/hbevocc/hbevocc-r50-256x704-openocc.py work_dirs/hbevocc0.4-00-r50-256x704-1f-openocc/iter_42195_ema.pth 1
+```
+
+This is the official PyTorch implementation for our paper:
+
+![vis](./asserts/vis_res.jpg)
+
+## News🚀
+
+* **[2025-03]** STCOcc is accepted to CVPR 2025.
+
+## Model Zoo
+
+We utilize 8 RTX4090 GPUs to train our model.
+
+|         Setting         | Epochs | Training Cost | RayIoU | MAVE |                                                Weights                                                | 
+|:-----------------------:|:------:|:-------------:|:------:|:----:|-------------------------------------------------------------------------------------------------------|
+| r50_704x256_16f_openocc |  ~48   |  32h,~8.7GB   |  40.8  | 0.44 | [Google-drive](https://drive.google.com/file/d/1_Ici4fsOk30Eqtc-nqUMcsj8NGi_dcxe/view?usp=drive_link) |
+|  r50_704_256_16f_occ3d  |  ~36   |  21h,~7,7GB   |  41.7  |  -   | [Google-drive](https://drive.google.com/file/d/1ZbjYlzq9B7b_ac8lLXP_1gV7TRzL1TvX/view?usp=drive_link)                                            |
+
+## Environment
+
+Install Pytorch 1.13 + CUDA 11.6
+
+```setup
+conda create --name stcocc python=3.8
+pip install torch==1.13.0+cu116 torchvision==0.14.0+cu116 torchaudio==0.13.0 --extra-index-url https://download.pytorch.org/whl/cu116
+```
+
+Install mmdet3d (v1.0.0rc4) related packages and build this project
+```setup
+pip install mmcv-full==1.7.0 -f https://download.openmmlab.com/mmcv/dist/cu117/torch1.13/index.html
+pip install mmdet==2.28.2
+pip install mmsegmentation==0.30.0
+pip install mmengine
+pip install -v -e .
+```
+
+Install other dependencies
+```setup
+pip install numpy==1.23.4
+pip install yapf==0.40.1
+pip install setuptools==59.5.0
+pip install ninja
+pip install einops
+pip install open3d==0.16.0
+```
+
+Due to the version of the dependencies, you may rise follow error, this [blog](https://blog.csdn.net/lzzzzzzm/article/details/133890916?spm=1001.2014.3001.5501) may help you
+```error
+error: too few arguments for template template parameter "Tuple" detected during instantiation of class "pybind11::detail::tuple_caster<Tuple, Ts...> [with Tuple=std::pair, Ts=<T1, T2>]"  (721): here
+```
+
+## Prepare Dataset
+
+1. Download nuScenes from [nuScenes](https://www.nuscenes.org/nuscenes) 
+
+2. Download Occ3D-nus from [Occ3D-nus](https://drive.google.com/file/d/1kiXVNSEi3UrNERPMz_CfiJXKkgts_5dY/view?usp=drive_link)
+
+3. Download OpenOcc from [OpenOcc-OpenDataLab](https://opendatalab.com/OpenDriveLab/CVPR24-Occ-Flow-Challenge/tree/main) 
+or [OpenOcc-Google Drive](https://drive.google.com/drive/folders/1lpqjXZRKEvNHFhsxTf0MOE13AZ3q4bTq)
+
+4. Download the generated info file from [Google Drive](https://drive.google.com/file/d/1KP25b3excY4N-3rqfkijuUmJLZeMwxZw/view?usp=sharing)
+and unzip it to the `data/nuscenes` folder. These `*pkl` files can be generated by running the `tools/create_data_bevdet.py`
+
+5. Download the pretrained weights from [Google Drive](https://drive.google.com/file/d/18Mxghwok1mlD1Pu2b16jjE13tszaxJUr/view?usp=drive_link).
+The pretrained weights is drived from [BEVDet](https://github.com/HuangJunJie2017/BEVDet), we just rename the weights to fit our model.
+
+5. Organize your folder structure as below:
+
+```
+├── project
+├── data/
+│   ├── nuscenes/
+│   │   ├── samples/ 
+│   │   ├── v1.0-trainval/
+│   │   ├── gts/ (Occ3D-nus)
+│   │   ├── openocc_v2/
+│   │   ├── stcocc-nuscenes_infos_train.pkl
+│   │   ├── stcocc-nuscenes_infos_val.pkl
+```
+
+6. Generate the multi-scale ground truth for Occ3D-nus or OpenOcc dataset:
+```generate_multi-scale-gt
+python tools/generate_ms_occ.py --dataset occ3d --pkl_path data/nuscenes/stcocc-nuscenes_infos_train.pkl
+```
+
+Finally the folder structure:
+
+```
+Project
+├── mmdet3d/
+├── tools/
+├── pretrained/
+│   ├── forward_projection-r50-4d-stereo-pretrained.pth
+├── data/
+│   ├── nuscenes/
+│   │   ├── samples/     # You can download our imgs.tar.gz or using the original sample files of the nuScenes dataset
+│   │   ├── v1.0-trainval/
+│   │   ├── gts/
+│   │   │   ├── scene_01/
+│   │   │   │   ├── scene_token/
+│   │   │   │   │   ├── lables.npz
+│   │   │   │   │   ├── lables_1_2.npz
+│   │   │   │   │   ├── lables_1_4.npz
+│   │   │   │   │   ├── lables_1_8.npz
+│   │   ├── stcocc-nuscenes_infos_train.pkl
+│   │   ├── stcocc-nuscenes_infos_val.pkl
+```
+
+## Training
+
+Train STCOcc with 8GPUs:
+
+```train
+bash tools/dist_train.sh config/stcocc/stcocc-r50-16f-openocc-12e.py 8
+```
+
+## Evaluation
+
+Evaluate STCOcc with 6GPUs:
+
+```eval
+bash tools/dist_test.sh config/stcocc/stcocc-r50-16f-openocc-12e.py path/to/ckpts 6
+```
+
+## Visualization
+If you want to visualize the results, change the config setting `save_results` to `True` and run the evaluation script.
+
+To visualize the single occ results, you can run the following command:
+```visualize
+python tools/vis_results.py --vis-single-data path/to/results
+```
+More visualization options can be found in the `tools/vis_results.py` script.
+
+
+## Acknowledgement
+
+Thanks to the following excellent projects:
+
+- [SparseOcc](https://github.com/MCG-NJU/SparseOcc)
+- [BEVDet](https://github.com/HuangJunJie2017/BEVDet)
+- [FB-Occ](https://github.com/NVlabs/FB-BEV)
+- [mmdetection3d](https://github.com/open-mmlab/mmdetection3d)

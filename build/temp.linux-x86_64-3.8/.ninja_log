@@ -1,0 +1,3 @@
+# ninja log v5
+5	987	1748936760557697388	/mnt/HDD/lcd/2D_3D/hbevocc/build/temp.linux-x86_64-3.8/mmdet3d/ops/bev_pool_v2/src/bev_pool_cuda.o	3fc3b98a847fb63d
+0	62380	1748936821917371052	/mnt/HDD/lcd/2D_3D/hbevocc/build/temp.linux-x86_64-3.8/mmdet3d/ops/bev_pool_v2/src/bev_pool.o	2270ad676f49ef64

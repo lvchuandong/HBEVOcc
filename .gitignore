@@ -1,0 +1,9 @@
+ckpts/
+data
+*.pyc
+*.o
+*.so
+work_dirs
+*.log
+results
+view.json
