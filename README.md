@@ -58,14 +58,14 @@ and unzip it to the `data/nuscenes` folder. Rename them to `'hbevocc-nuscenes_in
 
 ## 💡 Training and Evaluation
 
-Train STCOcc with 8 GPUs:
+Train HBEVOcc with 8 GPUs:
 
 ```train
 bash tools/dist_train.sh config/hbevocc/hbevocc-r50-256x704-1f-openocc.py 8
 bash tools/dist_train.sh config/hbevocc/hbevocc-r50-256x704-8f-openocc.py 8
 ```
 
-Evaluate STCOcc with 1 GPU or 8 GPUs:
+Evaluate HBEVOcc with 1 GPU or 8 GPUs:
 
 ```eval
 bash tools/dist_test.sh config/hbevocc/hbevocc-r50-256x704-1f-openocc.py path/to/ckpts 1
@@ -85,3 +85,14 @@ bash tools/dist_test.sh config/hbevocc/hbevocc-r50-256x704-8f-openocc.py path/to
 <div align="center">
 <img src="asserts/rayiou-openocc.png" width="90%">
 </div>
+
+## 🙏 Acknowledgement
+Many thanks to these excellent projects:
+
+- [STCOcc](https://github.com/lzzzzzm/STCOcc)
+- [FlashOCC](https://github.com/Yzichen/FlashOCC)
+- [BEVDet](https://github.com/HuangJunJie2017/BEVDet)
+- [FB-Occ](https://github.com/NVlabs/FB-BEV)
+- [BEVFormer](https://github.com/fundamentalvision/BEVFormer)
+- [DAT](https://github.com/LeapLabTHU/DAT)
+- [mmdetection3d](https://github.com/open-mmlab/mmdetection3d)

@@ -219,11 +219,6 @@ model = dict(
             col_num_embed=backward_bev_w,
         ),
     ),
-    # temporal_fusion=dict(
-    #     type='TemporalFusion',
-    #     single_bev_back_num_channels=backward_numC_Trans,
-    #     single_bev_for_num_channels=forward_numC_Trans,
-    # ),
     occupancy_head=dict(
         type='OccHead',
         in_channels=512,
